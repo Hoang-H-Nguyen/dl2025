@@ -1,3 +1,6 @@
+MAX_ITER = 2000000
+FILE_PATH = "./lr.csv"
+
 def read_csv(file_path):
     x = []
     y = []
@@ -19,7 +22,7 @@ def calculate_loss(w0, w1, x, y):
         sum += ( (w1 * x[i] + w0) - y[i] ) ** 2
     return (1 / 2) * (1 / N) * sum
 
-def gradient_descent(x, y, r, t, max_iters=10000):
+def gradient_descent(x, y, r, t, max_iters=MAX_ITER):
     N = len(x)
     w0 = 0
     w1 = 1
@@ -40,15 +43,14 @@ def gradient_descent(x, y, r, t, max_iters=10000):
         w1 = w1 - (r * dw1)
         
         loss = calculate_loss(w0, w1, x, y)
-        if iteration % 100 == 0:
+        if iteration % 100000 == 0:
             print(f"Iteration {iteration}: (w0={w0:.2f}, w1={w1:.2f}), loss={loss:.2f}")
         if loss < t:
             break
     return w0, w1        
 
-r = 0.01
-x, y = read_csv("./lr.csv")
-theshold = 0.01
-w0, w1 = gradient_descent(x, y, r, 0.01)
+r = 0.00001
+x, y = read_csv(FILE_PATH)
+theshold = 0.00001
+w0, w1 = gradient_descent(x, y, r, theshold)
 print(f"Final weights: w_0 = {w0}, w_1 = {w1}")
-print(x, y)
