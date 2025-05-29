@@ -1,6 +1,5 @@
 from utils.my_random import MyPseudoRandom
 from typing import List
-import numpy as np
 
 class ConvLayer:
     def __init__(self, num_filters: int = 2, filter_size: int = 2, filter_depth: int = 3) -> None:

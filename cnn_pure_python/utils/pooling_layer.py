@@ -1,6 +1,5 @@
 from typing import List
 import math
-import numpy as np
 
 class MaxPooling:
     def __init__(self, pooling_size: int = 2):
@@ -32,8 +31,6 @@ class MaxPooling:
                    for j in range(output_w)] 
                 for i in range(output_h)]
         
-        print(np.array(output).shape)
-
         for region, i, j in self.iterate_possible_regions(image_matrix):
             for dc in range(c):
                 max_val = float('-inf')
