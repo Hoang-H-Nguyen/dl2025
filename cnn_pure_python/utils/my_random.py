@@ -11,7 +11,7 @@ class MyPseudoRandom:
         self.a = a
         self.c = c
         self.X = seed
-
+        
     def next(self) -> float:
         self.X = (self.a * self.X + self.c) % self.m
         return self.X / self.m
