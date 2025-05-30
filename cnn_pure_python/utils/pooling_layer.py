@@ -1,7 +1,7 @@
 from typing import List
 import math
 
-class MaxPooling:
+class MaxPoolingLayer:
     def __init__(self, pooling_size: int = 2):
         self.pooling_size = pooling_size
 
@@ -41,14 +41,3 @@ class MaxPooling:
                             max_val = pixel_val
                 output[i][j][dc] = max_val
         return output
-
-# Test the implementation
-image = [
-    [[1,2,3],    [4,5,6],    [7,8,9]],
-    [[16,17,18], [19,20,21], [22,23,24]],
-    [[31,32,33], [34,35,36], [37,38,39]],
-]
-
-maxpooling = MaxPooling()
-result = maxpooling.forward(image)
-print(result)
