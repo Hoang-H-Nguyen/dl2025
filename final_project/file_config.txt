@@ -1,0 +1,6 @@
+input_shape: h=120, w=120, c=3
+conv: filter_size=3, num_filters=4
+maxpool: pooling_size=2
+dense1: output_size=12
+dense2: output_size=2
+num_classes: num_classes=3

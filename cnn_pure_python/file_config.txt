@@ -1,4 +1,0 @@
-conv1: filter_size=3, num_filters=16, filter_depth=3
-maxpool: pooling_size=2
-dense1: input_size=13456, output_size=64
-dense2: input_size=64, output_size=2

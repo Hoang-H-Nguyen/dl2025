@@ -17,6 +17,15 @@ class DenseLayer:
         self.cached_flatten_input = None
         self.cached_z = None
         self.cached_activations = None
+        self.cached_input_shape = None
+
+    @property
+    def value(self):
+        return self.input_size
+
+    @value.setter
+    def value(self, input_size):
+        self.input_size = input_size
 
     def flatten(self, input_matrix):
         if isinstance(input_matrix[0], list):
@@ -37,6 +46,34 @@ class DenseLayer:
         else:
             # already 1d matrix
             return input_matrix
+        
+    def reshape_to_original(self, flattened_data, original_input):
+        """Reshape flattened data back to the original input shape"""
+        if isinstance(original_input[0], list):
+            # check h, w, c image
+            if isinstance(original_input[0][0], list):
+                h, w, c = len(original_input), len(original_input[0]), len(original_input[0][0])
+                reshaped = [[[0 for _ in range(c)] for _ in range(w)] for _ in range(h)]
+                idx = 0
+                for i in range(h):
+                    for j in range(w):
+                        for k in range(c):
+                            reshaped[i][j][k] = flattened_data[idx]
+                            idx += 1
+                return reshaped
+            # check h, w image
+            else:
+                h, w = len(original_input), len(original_input[0])
+                reshaped = [[0 for _ in range(w)] for _ in range(h)]
+                idx = 0
+                for i in range(h):
+                    for j in range(w):
+                        reshaped[i][j] = flattened_data[idx]
+                        idx += 1
+                return reshaped
+        else:
+            # already 1d matrix
+            return flattened_data
         
     def apply_activation(self, x):
         if self.activation == 'relu':
@@ -80,6 +117,7 @@ class DenseLayer:
 
     def forward(self, input_data):
         self.cached_input_data = input_data
+        self.cached_input_shape = input_data
 
         flatten_input = self.flatten(input_data)
         self.cached_flatten_input = flatten_input
@@ -106,8 +144,6 @@ class DenseLayer:
         if self.cached_flatten_input is None or self.cached_z is None:
             raise ValueError("Forward pass must be called before backward pass")
         # Step 1: Compute gradient with respect to z
-        # d_z = d_output (assuming d_output already accounts for softmax derivative)
-        # This is typically handled by the loss function (e.g., categorical cross-entropy)
         if self.activation == 'softmax':
             d_z = d_output[:]
         else:
@@ -136,10 +172,10 @@ class DenseLayer:
             d_weights.append(d_weight_row)
 
         # Step 3: Compute gradient with respect to input
-        d_input = [0.0] * self.input_size
+        d_input_flat = [0.0] * self.input_size
         for i in range(self.input_size):
             for j in range(self.output_size):
-                d_input[i] += d_z[j] * self.weights[j][i]
+                d_input_flat[i] += d_z[j] * self.weights[j][i]
 
         # Step 4: Update weights and biases using gradients
         for j in range(self.output_size):
@@ -147,6 +183,9 @@ class DenseLayer:
             for i in range(self.input_size):
                 self.weights[j][i] -= learning_rate * d_weights[j][i]
 
+        # Step 5: Reshape d_input back to original input shape
+        d_input = self.reshape_to_original(d_input_flat, self.cached_input_shape)
+        
         return d_input
     
     def get_gradients(self, d_output):
@@ -177,10 +216,13 @@ class DenseLayer:
                 d_weight_row.append(d_z[j] * self.cached_flatten_input[i])
             d_weights.append(d_weight_row)
         
-        d_input = [0.0] * self.input_size
+        d_input_flat = [0.0] * self.input_size
         for i in range(self.input_size):
             for j in range(self.output_size):
-                d_input[i] += d_z[j] * self.weights[j][i]
+                d_input_flat[i] += d_z[j] * self.weights[j][i]
+        
+        # Reshape d_input back to original input shape
+        d_input = self.reshape_to_original(d_input_flat, self.cached_input_shape)
         
         return {
             'weights': d_weights,

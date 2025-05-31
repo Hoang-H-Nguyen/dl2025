@@ -68,14 +68,10 @@ class ConvLayer:
     def backward(self, d_out: List, learning_rate: float = 0.01) -> List:
         """
         Backward pass for convolution layer
-        
         Args:
-            d_out: Gradient of loss with respect to output of this layer
-                   Shape: [output_h, output_w, num_filters]
-        
+            d_out: Gradient of loss with respect to output of this layer, shape: [output_h, output_w, num_filters]
         Returns:
-            d_input: Gradient of loss with respect to output of previous layer
-                    Shape: [input_h, input_w, input_c]
+            d_input: Gradient of loss with respect to output of previous laye, shape: [input_h, input_w, input_c]
         """
         if self.cache_last_input is None:
             raise ValueError("Must call forward() before backward()")
